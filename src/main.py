@@ -1,14 +1,45 @@
 import os
+import time
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
-import random
-import time
 
+
+# Your 2Captcha API Key
+API_KEY = "dbabcc2df0eb91a8a022988d96dfbe06"
+
+class RecaptchaSolver:
+    def __init__(self, driver):
+        self.driver = driver
+        self.solver = TwoCaptcha(apiKey=API_KEY)
+
+    def solve_captcha(self):
+        # Step 1: Find the reCAPTCHA site key on the page
+        try:
+            site_key_element = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "[data-sitekey]"))
+            )
+            site_key = site_key_element.get_attribute("data-sitekey")
+            page_url = self.driver.current_url
+            print(f"Found site key: {site_key}")
+
+            # Step 2: Use 2Captcha to solve the reCAPTCHA
+            result = self.solver.recaptcha(sitekey=site_key, url=page_url)
+            print("2Captcha result:", result)
+
+            # Step 3: Inject the CAPTCHA solution into the page
+            captcha_solution = result["code"]
+            self.driver.execute_script(
+                'document.querySelector("[name=g-recaptcha-response]").innerText = "{}";'.format(captcha_solution)
+            )
+            print("Injected CAPTCHA solution into page.")
+
+            return True
+        except Exception as e:
+            print(f"An error occurred while solving CAPTCHA: {e}")
+            return False
 
 
 def cdc_bot():
@@ -50,30 +81,16 @@ def cdc_bot():
         )
         passwordbox.send_keys(password)
 
-        time.sleep(8)  # Increased sleep time to 8 seconds
 
-        # Instantiate the RecaptchaSolver and solve the CAPTCHA
-        recaptcha_solver = RecaptchaSolver(driver)
 
-        try:
-            # Perform CAPTCHA solving
-            t0 = time.time()
-            recaptcha_solver.solveCaptcha()  # This is the correct way to call the method
-            print(f"Time to solve the captcha: {time.time() - t0:.2f} seconds")
-
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            driver.quit()
-
-        # Wait for manual CAPTCHA solving if the image-based CAPTCHA appears
-        input("Please solve the CAPTCHA manually and press Enter to continue...")
 
         # Click the login button
-        login = WebDriverWait(driver, 30).until(  # Increased timeout to 30 seconds
-            EC.element_to_be_clickable((By.CLASS_NAME, "BTNSERVICE"))
-        )
-        login.click()
-        print("Login successful")
+        #login = WebDriverWait(driver, 30).until(  # Increased timeout to 30 seconds
+         #   EC.element_to_be_clickable((By.CLASS_NAME, "BTNSERVICE"))
+        #)
+        #login.click()
+        #print("Login successful")
+
     except Exception as e:
         print(e)
         print("Error at login")
