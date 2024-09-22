@@ -1,102 +1,166 @@
 import os
 import time
+import pickle
+import undetected_chromedriver as uc
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from twocaptcha import TwoCaptcha
-
-
-# Your 2Captcha API Key
-API_KEY = "dbabcc2df0eb91a8a022988d96dfbe06"
-
-class RecaptchaSolver:
-    def __init__(self, driver):
-        self.driver = driver
-        self.solver = TwoCaptcha(apiKey=API_KEY)
-
-    def solve_captcha(self):
-        # Step 1: Find the reCAPTCHA site key on the page
-        try:
-            site_key_element = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "[data-sitekey]"))
-            )
-            site_key = site_key_element.get_attribute("data-sitekey")
-            page_url = self.driver.current_url
-            print(f"Found site key: {site_key}")
-
-            # Step 2: Use 2Captcha to solve the reCAPTCHA
-            result = self.solver.recaptcha(sitekey=site_key, url=page_url)
-            print("2Captcha result:", result)
-
-            # Step 3: Inject the CAPTCHA solution into the page
-            captcha_solution = result["code"]
-            self.driver.execute_script(
-                'document.querySelector("[name=g-recaptcha-response]").innerText = "{}";'.format(captcha_solution)
-            )
-            print("Injected CAPTCHA solution into page.")
-
-            return True
-        except Exception as e:
-            print(f"An error occurred while solving CAPTCHA: {e}")
-            return False
+from selenium.webdriver.support.ui import Select
+from solveRecaptcha import solveRecaptcha
+import random
 
 
 def cdc_bot():
     PATH = r"C:/Users/clara/Downloads/chromedriver-win64/chromedriver.exe"
     service = Service(PATH)
 
-    # Hardcode the username and password
-    username = "00792272"
-    password = "Driving2243!"
+    # ensure that code is only executed when the script is run directly,
+    # not when it is imported as a module in another script.
+    if __name__ == '__main__':
+        username = "00792272"
+        password = "Driving2243!"
 
     # Configure Chrome options (non-headless mode)
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--start-maximized")
+    chrome_options.add_argument("--incognito")
+    chrome_options.add_argument(r'--user-data-dir=C:\Users\clara\AppData\Local\Google\Chrome\User Data\Default')
+
 
     # Use the Service object instead of passing PATH directly
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    browser = uc.Chrome(service=service, options=chrome_options)
 
-    driver.get("https://www.cdc.com.sg/")  # Replace with the actual URL of the CDC homepage
+    browser.get("https://www.cdc.com.sg/")  # Replace with the actual URL of the CDC homepage
+
+    cookies = pickle.load(open("cookies.pkl", "rb"))
+
+    if cookies:
+        for cookie in cookies:
+            cookie['domain'] = ".cdc.com.sg"
+
+            try:
+                browser.add_cookie(cookie)
+
+            except Exception as e:
+                print(e)
+                print("fail to use cookies")
+
+        browser.get('https://bookingportal.cdc.com.sg/NewPortal/Booking/Dashboard.aspx?')
+
+    else:
+        try:
+            # Click the button to go to the login page
+            login_button = WebDriverWait(browser, 30).until(  # Increased timeout to 30 seconds
+                EC.presence_of_element_located((By.CLASS_NAME, "dipl_modal_trigger_element"))
+            )
+            login_button.click()
+            print("Clicked on the login button")
+
+            # Input username
+            usernamebox = WebDriverWait(browser, 30).until(  # Increased timeout to 30 seconds
+                EC.presence_of_element_located((By.ID, "userId_4"))
+            )
+            usernamebox.send_keys(username)
+
+
+            # Input password
+            passwordbox = WebDriverWait(browser, 30).until(  # Increased timeout to 30 seconds
+                EC.presence_of_element_located((By.ID, "password_4"))
+            )
+            passwordbox.send_keys(password)
+
+            time.sleep(random.uniform(2, 5))  # Random sleep between 2 to 5 seconds
+        except Exception as e:
+            print(e)
+            print("Error at login")
+
+        try:
+            #solve captcha
+            result = solveRecaptcha(
+            "6LePQLQjAAAAALf3ZDUoa4Tu5b2KnXPbaJTNujGw",
+            "https://www.cdc.com.sg/"
+            )
+
+            code = result['code']
+
+            print(code)
+
+            WebDriverWait(browser, 10).until(
+                EC.presence_of_element_located((By.ID, 'g-recaptcha-response'))
+            )
+
+            browser.execute_script(
+                "document.getElementById('g-recaptcha-response').innerHTML = " + "'" + code + "'")
+
+            time.sleep(random.uniform(2, 5))  # Random sleep between 2 to 5 seconds
+
+
+        except Exception as e:
+            print(f"An error occurred while solving CAPTCHA: {e}")
+
+
+        try:
+            #Click the login button
+            login = WebDriverWait(browser, 30).until(  # Increased timeout to 30 seconds
+                EC.element_to_be_clickable((By.CLASS_NAME, "BTNSERVICE"))
+            )
+            login.click()
+            print("Login successful")
+
+        except Exception as e:
+            print(e)
+            print("Error after captcha")
+
+
+
+    #after logging in
+
 
     try:
-        # Click the button to go to the login page
-        login_button = WebDriverWait(driver, 30).until(  # Increased timeout to 30 seconds
-            EC.presence_of_element_located((By.CLASS_NAME, "dipl_modal_trigger_element"))
+        # Wait until the Practical Lesson button is present and clickable
+        # Wait until the Practical Lesson button is present and clickable by ID
+        practical_lesson_button = WebDriverWait(browser, 30).until(
+            EC.element_to_be_clickable((By.ID, "ctl00_Menu1_TreeView1t6"))
         )
-        login_button.click()
-        print("Clicked on the login button")
 
-        # Input username
-        usernamebox = WebDriverWait(driver, 30).until(  # Increased timeout to 30 seconds
-            EC.presence_of_element_located((By.ID, "userId_4"))
-        )
-        usernamebox.send_keys(username)
+        practical_lesson_button.click()
+        print("Clicked on the Practical Lesson button")
 
-        time.sleep(8)  # Increased sleep time to 8 seconds
+        time.sleep(random.uniform(2, 5))  # Random sleep between 2 to 5 seconds
 
-        # Input password
-        passwordbox = WebDriverWait(driver, 30).until(  # Increased timeout to 30 seconds
-            EC.presence_of_element_located((By.ID, "password_4"))
-        )
-        passwordbox.send_keys(password)
-
-
-
-
-        # Click the login button
-        #login = WebDriverWait(driver, 30).until(  # Increased timeout to 30 seconds
-         #   EC.element_to_be_clickable((By.CLASS_NAME, "BTNSERVICE"))
-        #)
-        #login.click()
-        #print("Login successful")
 
     except Exception as e:
         print(e)
-        print("Error at login")
+        print("Error clicking practial option")
+
+
+    try:
+        #Interact with the dropdown after it loads
+        dropdown = WebDriverWait(browser, 30).until(
+            EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder1_ddlCourse"))
+        )
+
+        #Select the option "04. Class 3A Motorcar (One Team)" using the Select class
+        select = Select(dropdown)
+        select.select_by_visible_text("04. Class 3A Motorcar (One Team)")
+        print("Selected '04. Class 3A Motorcar (One Team)' from the dropdown")
+
+        time.sleep(random.uniform(2, 5))
+
+
+
+    #slot selection
+
+    
+
+
+
     finally:
-        driver.quit()
+        if browser:
+            browser.quit()
 
 
 cdc_bot()
