@@ -7,9 +7,9 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from twocaptcha import TwoCaptcha
 from selenium.webdriver.support.ui import Select
 from solveRecaptcha import solveRecaptcha
+from bookings import logout
 import random
 
 
@@ -150,11 +150,25 @@ def cdc_bot():
 
         time.sleep(random.uniform(2, 5))
 
+    except Exception as e:
+        print(e)
+
 
 
     #slot selection
 
-    
+    try:
+        no_slots_message = WebDriverWait(browser, 10).until(
+            EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder1_lblFullBookMsg"))
+        )
+
+        if "No available slots currently" in no_slots_message.text:
+            print("No available slots currently. Logging out...")
+            logout(browser)  # Assuming logout is a function to handle logging out
+            return  # Exit the bot if no slots are available
+    except Exception as e:
+        print("No full booking message found, continuing slot selection.")
+
 
 
 
