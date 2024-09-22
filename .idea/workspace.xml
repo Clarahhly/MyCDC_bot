@@ -4,15 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2681fd2e-2897-4d08-82e6-d6e5dc5437e1" name="Changes" comment="initial commit">
-      <change afterPath="$PROJECT_DIR$/src/bookings.py" afterDir="false" />
+    <list default="true" id="2681fd2e-2897-4d08-82e6-d6e5dc5437e1" name="Changes" comment="bypassed reCaptcha and hiding chrome driver">
       <change afterPath="$PROJECT_DIR$/src/save_cookies.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/Captcha.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/common.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/log.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/solveRecaptcha.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/solveRecaptcha.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -127,11 +120,20 @@
       <option name="project" value="LOCAL" />
       <updated>1726936856585</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="bypassed reCaptcha and hiding chrome driver">
+      <option name="closed" value="true" />
+      <created>1727007183290</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1727007183290</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="initial commit" />
+    <MESSAGE value="bypassed reCaptcha and hiding chrome driver" />
+    <option name="LAST_COMMIT_MESSAGE" value="bypassed reCaptcha and hiding chrome driver" />
   </component>
 </project>
