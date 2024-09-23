@@ -7,15 +7,13 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from twocaptcha import TwoCaptcha
-from selenium.webdriver.support.ui import Select
-from solveRecaptcha import solveRecaptcha
-import random
+
+import datetime
 
 
 
-def click_month_button(browser):
-    """Click the button to filter sessions by a specific month (e.g., October)."""
+"""def click_month_button(browser):
+    Click the button to filter sessions by a specific month (e.g., October).
     try:
         # Locate the button for October and click it
         month_button = WebDriverWait(browser, 30).until(
@@ -25,83 +23,117 @@ def click_month_button(browser):
         print("Clicked on the month button to view October sessions.")
     except Exception as e:
         print(f"Error clicking month button: {e}")
+        
+        """
 
 
-def extract_booked_sessions(browser):
-    """Extract upcoming booked sessions from the first table."""
-    booked_sessions = []
+def get_available_sessions(browser):
+    """
+    Extracts available sessions from the session table on the CDC website.
 
-    # Wait for the booked sessions table to load
-    booking_table = WebDriverWait(browser, 30).until(
-        EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder1_gvBooked"))
-    )
+    :return: A sorted list of dictionaries, each representing an available session with date, day, session,
+     and id.
+    """
+    available_sessions = []
 
-    # Get all rows in the booked sessions table
-    rows = booking_table.find_elements(By.TAG_NAME, "tr")
+    try:
+        # Get the table rows containing session data
+        table_rows = browser.find_elements(By.XPATH, '//*[@id="ctl00_ContentPlaceHolder1_gvLatestav"]/tbody/tr')
 
-    # Iterate through rows and extract session information
-    for row in rows[1:]:  # Skip the header row
-        columns = row.find_elements(By.TAG_NAME, "td")
-        if len(columns) > 0:
-            session_date = columns[0].text
-            start_time = columns[2].text
-            end_time = columns[3].text
+        # Iterate through rows and check for available slots
+        for row in table_rows[1:]:  # Skip header row
+            cells = row.find_elements(By.TAG_NAME, 'td')
+            date = cells[0].text.strip()  # Date in dd/MMM/yyyy format (e.g., 04/Oct/2024)
+            day = cells[1].text.strip()  # Day (e.g., FRI)
 
-            # Append the session as a tuple (session_date, start_time, end_time)
-            booked_sessions.append((session_date, start_time, end_time))
+            for i in range(2, len(cells)):
+                session_cell = cells[i].find_element(By.TAG_NAME, 'input')
+                if session_cell and 'Images1.gif' in session_cell.get_attribute('src'):
+                    session_data = {
+                        'date': datetime.datetime.strptime(date, '%d/%b/%Y'),
+                        'day': day,
+                        'session': i - 1,  # Session number (starting from 1)
+                        'id': session_cell.get_attribute('id')
+                    }
+                    available_sessions.append(session_data)
 
-    return booked_sessions
+    except Exception as e:
+        print(f"Error while fetching available sessions: {e}")
 
+    # Sort the available sessions by date
+    sorted_sessions = sort_sessions_by_date(available_sessions)
 
-def is_slot_available(booked_sessions, session_date, start_time, end_time):
-    """Check if a session slot conflicts with already booked sessions."""
-    for booked_session in booked_sessions:
-        booked_date, booked_start, booked_end = booked_session
-
-        # Compare the session date and time
-        if session_date == booked_date:
-            # Check if the time overlaps (basic comparison)
-            if not (end_time <= booked_start or start_time >= booked_end):
-                return False  # Conflict found
-
-    return True  # No conflict found
+    return sorted_sessions
 
 
-def select_available_slot(browser, booked_sessions):
-    """Select a slot from the available sessions."""
+def sort_sessions_by_date(sessions):
+    """
+    Sorts a list of session dictionaries by date.
 
-    # Wait for the available slots table to load
-    available_slots_table = WebDriverWait(browser, 30).until(
-        EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder1_gvLatestav"))
-    )
+    :param sessions: A list of dictionaries containing session information.
+    :return: A sorted list of dictionaries by date.
+    """
+    # Sort sessions by date
+    sorted_sessions = sorted(sessions, key=lambda x: x['date'])
 
-    # Get all rows in the available slots table
-    rows = available_slots_table.find_elements(By.TAG_NAME, "tr")
+    # Optionally, convert datetime object back to string for readability
+    sorted_sessions_list = [
+        {
+            'date': session['date'].strftime('%d/%b/%Y'),  # Convert datetime back to string
+            'day': session['day'],
+            'session': session['session'],
+            'id': session['id']
+        }
+        for session in sorted_sessions
+    ]
 
-    # Iterate through rows and extract slot information
-    for row in rows[1:]:  # Skip the header row
-        columns = row.find_elements(By.TAG_NAME, "td")
+    return sorted_sessions_list
 
-        if len(columns) > 0:
-            session_date = columns[0].text  # Get the session date
-            # Example: start_time and end_time for a session
-            start_time = "16:25:00"  # Modify as needed
-            end_time = "18:05:00"  # Modify as needed
 
-            # Check if the session is available
-            session_button = columns[6].find_element(By.TAG_NAME, "input")  # Adjust index based on the session
-            is_available = "Images1.gif" in session_button.get_attribute("src")  # Check if the session is available
+from selenium.webdriver.common.keys import Keys
 
-            if is_available:
-                # Check if this slot conflicts with existing bookings
-                if is_slot_available(booked_sessions, session_date, start_time, end_time):
-                    session_button.click()  # Click the button to book the session
-                    print(f"Booked session on {session_date} from {start_time} to {end_time}")
-                    return
-                else:
-                    print(f"Slot on {session_date} from {start_time} to {end_time} conflicts with existing bookings.")
 
-    print("No available, non-conflicting slots found.")
+def book_earliest_thursday(browser, sessions):
+    # Step 1: Filter for the earliest Thursday session
+    thursday_sessions = [session for session in sessions if session['day'] == 'THU']
+
+    if not thursday_sessions:
+        print("No available Thursday sessions.")
+        return
+
+    # Step 2: Sort the sessions by date and get the earliest
+    earliest_thursday = thursday_sessions[0]  # Assumes the list is already sorted
+
+    try:
+        # Step 3: Click the image button for the earliest Thursday session
+        session_button = WebDriverWait(browser, 30).until(
+            EC.element_to_be_clickable((By.ID, earliest_thursday['id']))
+        )
+        session_button.click()
+        print(f"Clicked on the session for {earliest_thursday['date']} - Session {earliest_thursday['session']}")
+
+        # Step 4: Simulate pressing the Enter key to confirm the reservation
+        session_button.send_keys(Keys.ENTER)
+        print("Pressed Enter to confirm reservation.")
+
+        # Step 5: Wait for the image to change (indicating the reservation)
+        WebDriverWait(browser, 30).until(
+            EC.text_to_be_present_in_element_attribute(
+                (By.ID, earliest_thursday['id']), "src", "Images2.gif"
+            )
+        )
+        print("Session reserved successfully (Image changed to 'Images2.gif').")
+
+        # Step 6: Click the 'Next' button to proceed to checkout
+        next_button = WebDriverWait(browser, 30).until(
+            EC.element_to_be_clickable((By.ID, "ctl00_ContentPlaceHolder1_btnCheckout"))
+        )
+        next_button.click()
+        print("Clicked the 'Next' button to proceed to checkout.")
+
+    except Exception as e:
+        print(f"Error during the booking process: {e}")
+
 
 
 def logout(browser):

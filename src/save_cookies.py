@@ -11,17 +11,18 @@ import random
 
 
 def cookie_bot():
-    PATH = r"C:/Users/clara/Downloads/chromedriver-win64/chromedriver.exe"
+    PATH = r"PATH TO FIND CHROME DRIVER (eg. C:/Users/clara/Downloads/chromedriver-win64/chromedriver.exe)"
     service = Service(PATH)
 
     # ensure that code is only executed when the script is run directly,
     # not when it is imported as a module in another script.
     if __name__ == '__main__':
-        username = "00792272"
-        password = "Driving2243!"
+        username = "USERNAME"
+        password = "PASSWORD"
 
     # Configure Chrome options (non-headless mode)
     chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument(r'--user-data-dir= FIND FROM CHROME VERSION')
 
 
     # Use the Service object instead of passing PATH directly

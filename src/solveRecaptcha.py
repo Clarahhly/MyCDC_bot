@@ -6,7 +6,7 @@ from twocaptcha import TwoCaptcha
 def solveRecaptcha(sitekey, url):
 
     sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-    api_key = "dbabcc2df0eb91a8a022988d96dfbe06"
+    api_key = "YOUR API KEY"
     solver = TwoCaptcha(api_key)
 
     try:
