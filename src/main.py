@@ -20,9 +20,7 @@ preferredDay = ["TUE"]
 def cdc_bot(start_time):
     booking_success = False
 
-    # Use the Service object instead of passing PATH directly
     browser = get_chromedriver(use_proxy=True)
-
     browser.get("https://www.cdc.com.sg/")
 
 
@@ -102,12 +100,12 @@ def cdc_bot(start_time):
             else:
                 print("Failed to book a slot. Retrying in 2 minutes...")
                 booking_success = False
-                time.sleep(120)  # Wait 2 minutes before retrying
+                time.sleep(120)
 
         except Exception as e:
             print(f"Error during booking process: {e}")
             booking_success = False
-            time.sleep(120)  # Wait 2 minutes before retrying
+            time.sleep(120)
 
     # Quit the browser only if the booking was successful
     try:
@@ -124,7 +122,7 @@ def run_with_retries():
         cdc_bot(start_time)
         elapsed_time = time.time() - start_time
 
-        # Check if the bot completed within 15 minutes, otherwise wait until the 15 minute mark
+        # Check if the bot completed within 15 minutes, otherwise restart
         if elapsed_time > 900:
             print(f"Elapsed time is {elapsed_time:.2f} seconds. Restarting the bot immediately.")
             continue  # Restart the bot immediately by continuing the loop

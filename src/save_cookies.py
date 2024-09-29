@@ -10,17 +10,11 @@ from solveRecaptcha import solveRecaptcha
 from proxy import get_chromedriver
 
 def cookie_bot():
-
-    # ensure that code is only executed when the script is run directly,
-    # not when it is imported as a module in another script.
-    username = "USERNAME"  # Your username
-    password = "PASSWORD"  # Your password
+    username = "USERNAME"
+    password = "PASSWORD"
 
     browser = get_chromedriver(use_proxy=True)
-
-    browser.get("https://www.cdc.com.sg/")  # Replace with the actual URL of the CDC homepage
-
-
+    browser.get("https://www.cdc.com.sg/")
 
     # Click the button to go to the login page
     login_button = WebDriverWait(browser, 30).until(  # Increased timeout to 30 seconds

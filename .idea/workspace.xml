@@ -5,10 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2681fd2e-2897-4d08-82e6-d6e5dc5437e1" name="Changes" comment="bypassed reCaptcha and hiding chrome driver">
-      <change afterPath="$PROJECT_DIR$/src/proxy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/bookings.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/bookings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cookies.pkl" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/save_cookies.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/save_cookies.py" afterDir="false" />
     </list>
