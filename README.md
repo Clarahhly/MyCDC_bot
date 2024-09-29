@@ -1,6 +1,7 @@
 # CDC Bot for Booking Driving Lessons
 
-A little project I did for fun. This project automates the process of booking practical driving lessons on the Singapore CDC (ComfortDelGro Driving Centre) website. The bot uses Selenium, solves CAPTCHA challenges, and selects available sessions based on user-defined preferences for time and day.
+A little project I did for fun. This project automates the process of booking practical driving lessons on the Singapore CDC (ComfortDelGro Driving Centre) website. The bot uses Selenium, solves CAPTCHA challenges, and selects available sessions based on user-defined preferences for time and day. <br>
+The bot can only reserve the slot for you. Reserved slots will only be held for 30 minutes. So keep a look out! (or you can connect it to a telebot to inform you when a slot is reserved)
 
 
 ## Prerequisites
