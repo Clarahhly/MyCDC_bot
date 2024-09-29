@@ -1,34 +1,26 @@
 import time
+import pickle
+import random
 import undetected_chromedriver as uc
-from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from solveRecaptcha import solveRecaptcha
-import pickle
-import random
-
+from proxy import get_chromedriver
 
 def cookie_bot():
-    PATH = r"PATH TO FIND CHROME DRIVER (eg. C:/Users/clara/Downloads/chromedriver-win64/chromedriver.exe)"
-    service = Service(PATH)
 
     # ensure that code is only executed when the script is run directly,
     # not when it is imported as a module in another script.
-    if __name__ == '__main__':
-        username = "USERNAME"
-        password = "PASSWORD"
+    username = "USERNAME"  # Your username
+    password = "PASSWORD"  # Your password
 
-    # Configure Chrome options (non-headless mode)
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument(r'--user-data-dir= FIND FROM CHROME VERSION')
-
-
-    # Use the Service object instead of passing PATH directly
-    browser = uc.Chrome(service=service, options=chrome_options)
+    browser = get_chromedriver(use_proxy=True)
 
     browser.get("https://www.cdc.com.sg/")  # Replace with the actual URL of the CDC homepage
+
+
 
     # Click the button to go to the login page
     login_button = WebDriverWait(browser, 30).until(  # Increased timeout to 30 seconds
@@ -85,6 +77,7 @@ def cookie_bot():
 
     pickle.dump(cookies, open("cookies.pkl", "wb"))
 
-
+    if browser:
+        browser.quit()
 
 cookie_bot()

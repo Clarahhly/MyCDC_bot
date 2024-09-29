@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2681fd2e-2897-4d08-82e6-d6e5dc5437e1" name="Changes" comment="bypassed reCaptcha and hiding chrome driver">
+      <change afterPath="$PROJECT_DIR$/src/proxy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/bookings.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/bookings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/cookies.pkl" beforeDir="false" />
@@ -55,8 +56,10 @@
     "Python.Captcha.executor": "Run",
     "Python.bookings.executor": "Run",
     "Python.main.executor": "Run",
+    "Python.proxy.executor": "Run",
     "Python.saveCookies.executor": "Run",
     "Python.save_cookies.executor": "Run",
+    "Python.solveRecaptcha.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "main",
     "run.code.analysis.last.selected.profile": "aDefault",
@@ -136,9 +139,31 @@
     <option name="localTasksCounter" value="7" />
     <servers />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial commit" />
     <MESSAGE value="bypassed reCaptcha and hiding chrome driver" />
     <option name="LAST_COMMIT_MESSAGE" value="bypassed reCaptcha and hiding chrome driver" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/bookings.py</url>
+          <line>15</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
